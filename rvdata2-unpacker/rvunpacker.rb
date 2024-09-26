@@ -882,6 +882,6 @@ if __FILE__ == $0
   project_root = ARGV[1] || "."
   puts "#{action.chop.capitalize}ing Scripts.rvdata2 in [#{project_root}] ..."
   RGSS.serialize(:ace, direction, project_root, options)
-  puts "Done, press any key to exit."
-  STDIN.getc
+  # puts "Done, press any key to exit."
+  # STDIN.getc
 end
