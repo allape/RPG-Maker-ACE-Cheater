@@ -8,7 +8,7 @@ Prototyping...
     - Open game folder, and make sure every command executes at the root of the game folder.
     - Open a terminal/cmd/powershell window in game folder by `Shift + Mouse Right Click` -> `Open in Terminal`.
     - If `rvunpacker.exe` is untrusted, you may need to download Ruby DevKit then run with
-      ```ruby
+      ```shell
       ruby rvdata2-unpacker/rvunpacker.rb decode .
       ```
       - See [README.md](rvdata2-unpacker/README.md) for more details.
