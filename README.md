@@ -2,6 +2,14 @@
 
 # How to Patch on Windows
 
+## Auto
+
+- Download `RPG-Maker-ACE-Cheater-Patcher.exe` from https://github.com/allape/RPG-Maker-ACE-Cheater/releases, and put it in
+  the game folder.
+- Double click `RPG-Maker-ACE-Cheater-Patcher.exe` to patch the game.
+
+## Manually
+
 - Preparing
     - Open game folder, and make sure every command executes at the root of the game folder.
     - Open a terminal/cmd/powershell window in game folder by `Shift + Mouse Right Click` -> `Open in Terminal`.
