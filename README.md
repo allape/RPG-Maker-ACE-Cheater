@@ -1,7 +1,5 @@
 # RPG Maker VX Ace Cheater
 
-Prototyping...
-
 # How to Patch on Windows
 
 - Preparing
@@ -11,7 +9,7 @@ Prototyping...
       ```shell
       ruby rvdata2-unpacker/rvunpacker.rb decode .
       ```
-      - See [README.md](rvdata2-unpacker/README.md) for more details.
+        - See [README.md](rvdata2-unpacker/README.md) for more details.
 - Use [RPGMakerDecrypter-cli.exe](https://github.com/uuksu/RPGMakerDecrypter) to unpack `Game.rgss3a`.
     - Download `RPGMakerDecrypter-cli.exe`
       from [https://github.com/uuksu/RPGMakerDecrypter/releases](https://github.com/uuksu/RPGMakerDecrypter/releases).
@@ -76,6 +74,13 @@ Prototyping...
     - Should open `Menu` -> `Item List` first, and select the corresponding item
 - `[`: Save current position
 - `]`: Load saved position
+
+# Dev
+
+- Download `RPGMakerDecrypter-cli.exe` from https://github.com/uuksu/RPGMakerDecrypter/releases, and put it in root of
+  project along
+  with [main.go](main.go).
+- Run [build.sh](build.sh) or [build.bat](build.bat) to build the patcher.
 
 # Credits
 
