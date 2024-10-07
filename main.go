@@ -9,7 +9,6 @@ import (
 	"path"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/manifoldco/promptui"
 )
@@ -99,9 +98,6 @@ func main() {
 	Println("If this program failed to patch your game, please do it manually with the instructions in README.md.")
 
 	Println()
-	Println("Booting up...")
-
-	time.Sleep(3 * time.Second)
 
 	// replace `CheatScript` if a AsCheater.rb exists in current folder
 	if _, err := os.Stat(CheatScriptRB); err == nil {
@@ -149,7 +145,13 @@ func main() {
 	case 1:
 		restoreGame(root)
 	case 2:
-		restoreGame(root)
+		rgss3 := path.Join(root, GameRGSS3ABackup)
+		_, err := os.Stat(rgss3)
+		if err != nil {
+			Println("Failed to find", rgss3, ", nothing to restore, start patching straight away")
+		} else {
+			restoreGame(root)
+		}
 		patch(root)
 	}
 
@@ -195,8 +197,7 @@ func injectMain(exe, root string) {
 	}
 
 	if strings.Contains(string(mainText), CheatScript) {
-		Println("Game already patched")
-		return
+		Fatalln("Game already patched")
 	}
 
 	err = os.WriteFile(mainRb, []byte(fmt.Sprintf("%s\r\n%s", CheatScript, string(mainText))), 0644)
@@ -274,4 +275,6 @@ func restoreGame(root string) {
 	if err != nil {
 		Fatalln("Failed to rename", src, "to", dis, ":", err)
 	}
+
+	Println("Restored Game.exe at", root)
 }
