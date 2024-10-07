@@ -78,7 +78,14 @@
 
 - `` ` ``: Save game at slot 2
 - `1`: Cure all alias
-- `2`: Kill all enemies
+- `2`: Make all enemies one
+- `3`: Kill all enemies
+- `4`: Reserved
+- `5`: Reserved
+- `6`: Cure all enemies
+- `7`: Make all alias one
+- `8`: Reserved
+- `9`: Reserved
 - `0`: Gain gold 10K
 - `-`: Reduce the amount of current selected item by 1
     - Should open `Menu` -> `Item List` first, and select the corresponding item

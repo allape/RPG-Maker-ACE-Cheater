@@ -55,17 +55,38 @@ module AsCheater
 
     if pressed(0x31) # 1 > cure all alias
       $game_party.all_members.each do |actor|
-        unless actor.alive?
-          return
-        end
         actor.recover_all
       end
       Sound.play_ok
     end
 
-    if pressed(0x32) # 2 > kill all enemies
+    if pressed(0x32) # 2 > make all enemies one
+      $game_troop.alive_members.each do |enemy|
+        enemy.hp = 1 # may cause crash
+      end
+      Sound.play_ok
+    end
+
+    if pressed(0x33) # 3 > kill all enemies
       $game_troop.alive_members.each do |enemy|
         enemy.hp = 0
+      end
+      Sound.play_ok
+    end
+
+    if pressed(0x36) # 6 > cure all enemies
+      $game_troop.members.each do |enemy|
+        enemy.recover_all
+      end
+      Sound.play_ok
+    end
+
+    if pressed(0x37) # 7 > all alias one
+      $game_party.all_members.each do |actor|
+        unless actor.alive?
+          return
+        end
+        actor.hp = 1
       end
       Sound.play_ok
     end

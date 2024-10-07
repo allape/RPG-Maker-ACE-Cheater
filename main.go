@@ -17,6 +17,7 @@ const (
 	ScriptsRVDARA2 = "Scripts.rvdata2"
 	MainRB         = "Main.rb"
 	SceneBaseRB    = "Scene_Base.rb"
+	CheatScriptRB  = "AsCheater.rb"
 )
 
 const (
@@ -85,6 +86,16 @@ func main() {
 	Println("Booting up...")
 
 	time.Sleep(3 * time.Second)
+
+	// replace `CheatScript` if a AsCheater.rb exists in current folder
+	if _, err := os.Stat(CheatScriptRB); err == nil {
+		Println("Using", CheatScriptRB, "in current folder")
+		bs, err := os.ReadFile(CheatScriptRB)
+		if err != nil {
+			Fatalln("Failed to read", CheatScriptRB, ":", err)
+		}
+		CheatScript = string(bs)
+	}
 
 	dec := createExe("RPGMAC-RPGMakerDecrypter-cli.exe", RPGMakerDecrypterCLIBin)
 	rvu := createExe("RPGMAC-rvunpacker.exe", RVUnpackerBin)
