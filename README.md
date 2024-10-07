@@ -2,6 +2,10 @@
 
 # How to Patch on Windows
 
+## Preparing
+- Do NOT run patch under a path that contains non-english characters.
+  - `rvunpacker.exe` will fail with a path contains Japanese characters on `Windows 10` with Japanese encoding.
+
 ## Auto
 
 - Download `RPG-Maker-ACE-Cheater-Patcher.exe` from https://github.com/allape/RPG-Maker-ACE-Cheater/releases, and put it in
