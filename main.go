@@ -10,14 +10,17 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/manifoldco/promptui"
 )
 
 const (
-	GameRGSS3A     = "Game.rgss3a"
-	ScriptsRVDARA2 = "Scripts.rvdata2"
-	MainRB         = "Main.rb"
-	SceneBaseRB    = "Scene_Base.rb"
-	CheatScriptRB  = "AsCheater.rb"
+	GameRGSS3A       = "Game.rgss3a"
+	GameRGSS3ABackup = "Game.rgss3a~"
+	ScriptsRVDARA2   = "Scripts.rvdata2"
+	MainRB           = "Main.rb"
+	SceneBaseRB      = "Scene_Base.rb"
+	CheatScriptRB    = "AsCheater.rb"
 )
 
 const (
@@ -69,6 +72,19 @@ func createExe(name string, data []byte) string {
 	return file.Name()
 }
 
+func run(name, cwd string, arg ...string) {
+	cmd := exec.Command(name, arg...)
+	cmd.Dir = cwd
+
+	output, err := cmd.CombinedOutput()
+	if len(output) > 0 {
+		Println(name, ":\n", string(output))
+	}
+	if err != nil {
+		Fatalln("Failed to run", name, ":", err)
+	}
+}
+
 func main() {
 	if runtime.GOOS != "windows" {
 		Fatalln("This program only runs on Windows")
@@ -97,9 +113,6 @@ func main() {
 		CheatScript = string(bs)
 	}
 
-	dec := createExe("RPGMAC-RPGMakerDecrypter-cli.exe", RPGMakerDecrypterCLIBin)
-	rvu := createExe("RPGMAC-rvunpacker.exe", RVUnpackerBin)
-
 	root := "."
 	if len(os.Args) > 1 {
 		root = os.Args[1]
@@ -114,8 +127,41 @@ func main() {
 		Fatalln(root, "is not a directory")
 	}
 
+	selections := []string{
+		"Patch this game(default)",    // 0
+		"Restore game",                // 1
+		"Re-patch(Restore and Patch)", // 2
+	}
+
+	prompt := promptui.Select{
+		Label: "Select a patching operation",
+		Items: selections,
+	}
+	index, _, err := prompt.Run()
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	switch index {
+	case 0:
+		patch(root)
+	case 1:
+		restoreGame(root)
+	case 2:
+		restoreGame(root)
+		patch(root)
+	}
+
+	pause()
+}
+
+func patch(root string) {
+	dec := createExe("RPGMAC-RPGMakerDecrypter-cli.exe", RPGMakerDecrypterCLIBin)
+	rvu := createExe("RPGMAC-rvunpacker.exe", RVUnpackerBin)
+
 	scriptsRVDARA2 := path.Join(root, "Data", ScriptsRVDARA2)
-	_, err = os.Stat(scriptsRVDARA2)
+	_, err := os.Stat(scriptsRVDARA2)
 	if err != nil {
 		unzipGame(dec, root)
 		injectMain(rvu, root)
@@ -125,21 +171,6 @@ func main() {
 	}
 
 	Println("Patched Game.exe at", root)
-
-	pause()
-}
-
-func run(name, cwd string, arg ...string) {
-	cmd := exec.Command(name, arg...)
-	cmd.Dir = cwd
-
-	output, err := cmd.CombinedOutput()
-	if len(output) > 0 {
-		Println(name, ":\n", string(output))
-	}
-	if err != nil {
-		Fatalln("Failed to run", name, ":", err)
-	}
 }
 
 func injectMain(exe, root string) {
@@ -192,6 +223,9 @@ func injectMain(exe, root string) {
 	sceneBaseInjectedText += "\r\n" + SceneBaseInjectionScript + "\r\n"
 	sceneBaseInjectedText += strings.Join(sceneBaseLines[injectPoint+1:], "\r\n")
 	err = os.WriteFile(sceneBaseRb, []byte(sceneBaseInjectedText+"\r\n"), 0644)
+	if err != nil {
+		Fatalln("Failed to write", sceneBaseRb, ":", err)
+	}
 
 	// encode Scripts.rvdata2
 	run(exe, root, "encode", root)
@@ -200,12 +234,44 @@ func injectMain(exe, root string) {
 func unzipGame(exe, root string) {
 	Println("Unzipping Game.exe...")
 	src := path.Join(root, GameRGSS3A)
-	dst := path.Join(root, GameRGSS3A+"~")
+	dst := path.Join(root, GameRGSS3ABackup)
 	run(exe, root, src)
 
 	Println("Renaming", src, "to", dst)
 	err := os.Rename(src, dst)
 	if err != nil {
 		Fatalln("Failed to rename", src, "to", dst, ":", err)
+	}
+}
+
+func restoreGame(root string) {
+	src := path.Join(root, GameRGSS3ABackup)
+	dis := path.Join(root, GameRGSS3A)
+	_, err := os.Stat(src)
+	if err != nil {
+		Fatalln("Failed to find", src, ", nothing to restore")
+	}
+
+	scriptsPath := path.Join(root, "Scripts")
+	err = os.RemoveAll(scriptsPath)
+	if err != nil {
+		Fatalln("Failed to remove", scriptsPath, ":", err)
+	}
+
+	yamlPath := path.Join(root, "YAML")
+	err = os.RemoveAll(yamlPath)
+	if err != nil {
+		Fatalln("Failed to remove", yamlPath, ":", err)
+	}
+
+	scriptsRvdata2 := path.Join(root, "Data", ScriptsRVDARA2)
+	err = os.Remove(scriptsRvdata2)
+	if err != nil {
+		Fatalln("Failed to remove", scriptsRvdata2, ":", err)
+	}
+
+	err = os.Rename(src, dis)
+	if err != nil {
+		Fatalln("Failed to rename", src, "to", dis, ":", err)
 	}
 }
