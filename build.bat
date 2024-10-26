@@ -1,3 +1,3 @@
 @echo off
 
-go build -o RPG-Maker-ACE-Cheater-Patcher.exe
+go build -trimpath -o RPG-Maker-ACE-Cheater-Patcher.exe
