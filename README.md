@@ -3,12 +3,14 @@
 # How to Patch on Windows
 
 ## Preparing
+
 - Do NOT run patch under a path that contains non-english characters.
-  - `rvunpacker.exe` will fail with a path contains Japanese characters on `Windows 10` with Japanese encoding.
+    - `rvunpacker.exe` will fail with a path contains Japanese characters on `Windows 10` with Japanese encoding.
 
 ## Auto
 
-- Download `RPG-Maker-ACE-Cheater-Patcher.exe` from https://github.com/allape/RPG-Maker-ACE-Cheater/releases, and put it in
+- Download `RPG-Maker-ACE-Cheater-Patcher.exe` from https://github.com/allape/RPG-Maker-ACE-Cheater/releases, and put it
+  in
   the game folder.
 - Double click `RPG-Maker-ACE-Cheater-Patcher.exe` to patch the game.
 
@@ -87,12 +89,19 @@
 - `8`: Reserved
 - `9`: Reserved
 - `0`: Gain gold 10K
-- `-`: Reduce the amount of current selected item by 1
+- `-`: Decrease the amount of current selected item by 1, by 10 if `Shift` is pressed
     - Should open `Menu` -> `Item List` first, and select the corresponding item
-- `+`: Increase the amount of current selected item by 1
+- `+`: Increase the amount of current selected item by 1, by 10 if `Shift` is pressed
     - Should open `Menu` -> `Item List` first, and select the corresponding item
 - `[`: Save current position
 - `]`: Load saved position
+- `q`: Execute `asac.q.rb` script file in the game root folder
+  - If script file contains runtime error, the game will crash
+- `w`: Execute `asac.w.rb` script file in the game root folder
+  - If script file contains runtime error, the game will crash
+- `e`: Execute `asac.e.rb` script file in the game root folder
+  - If script file contains runtime error, the game will crash
+- `r`: Reload loaded `asac.*.rb` script files
 
 # Dev
 

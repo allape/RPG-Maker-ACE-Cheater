@@ -8,6 +8,8 @@ module AsCheater
   MessageBox = Win32API.new("user32", "MessageBox", %w[i p p i], "i")
   # MessageBox.call(0, "message", "title", 0)
 
+  LoadableASACIndexes = %w[q w e]
+
   # noinspection RubyResolve
   @state = DL::CPtr.new(DL.malloc(256), 256)
   @debounce = Time.now.to_f
@@ -16,8 +18,32 @@ module AsCheater
   @saved_x = 0
   @saved_y = 0
 
+  @loaded_asac_files = {}
+
+  def self.load_asac_files
+    LoadableASACIndexes.each do |index|
+      filename = "asac." + index + ".rb"
+      if File.exist?(filename)
+        @loaded_asac_files[index] = File.read(filename)
+      end
+    end
+  end
+
+  def self.eval_asac_file(index)
+    if @loaded_asac_files[index]
+      eval(@loaded_asac_files[index])
+      Sound.play_ok
+    else
+      Sound.play_buzzer
+    end
+  end
+
   def self.pressed(key_code)
     return @state[key_code] & DOWN_STATE_MASK == DOWN_STATE_MASK
+  end
+
+  def self.is_shift_key_pressed
+    return (@state[0xA0] & DOWN_STATE_MASK == DOWN_STATE_MASK) || (@state[0xA1] & DOWN_STATE_MASK == DOWN_STATE_MASK)
   end
 
   def self.gain_item(amount)
@@ -45,11 +71,16 @@ module AsCheater
     # https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 
     if pressed(0xC0) # ` > save at slot 2
+      save_index = 1
       if $game_party.all_members.length == 0
         Sound.play_buzzer
         return
       end
-      DataManager.save_game_without_rescue(1)
+      if DataManager.respond_to?(:save_game_with_preview)
+        DataManager.save_game_with_preview(save_index)
+      else
+        DataManager.save_game_without_rescue(save_index)
+      end
       Sound.play_ok
     end
 
@@ -97,11 +128,19 @@ module AsCheater
     end
 
     if pressed(0xBD) # - > decrease the amount of selected item
-      gain_item(-1)
+      if is_shift_key_pressed
+        gain_item(-10)
+      else
+        gain_item(-1)
+      end
     end
 
     if pressed(0xBB) # = > increase the amount of selected item
-      gain_item(1)
+      if is_shift_key_pressed
+        gain_item(10)
+      else
+        gain_item(1)
+      end
     end
 
     if pressed(0xDB) # [ -> Save current position
@@ -119,5 +158,24 @@ module AsCheater
         Sound.play_buzzer
       end
     end
+
+    if pressed(0x51) # Q -> Run asac.q.rb
+      eval_asac_file('q')
+    end
+
+    if pressed(0x57) # W -> Run asac.w.rb
+      eval_asac_file('w')
+    end
+
+    if pressed(0x45) # E -> Run asac.e.rb
+      eval_asac_file('e')
+    end
+
+    if pressed(0x52) # R -> Reload all asac files
+      load_asac_files
+      Sound.play_ok
+    end
   end
 end
+
+AsCheater.load_asac_files
